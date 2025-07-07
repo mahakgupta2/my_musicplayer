@@ -14,15 +14,27 @@ class AppTheme{
               textStyle: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30)
-              )
-          )
-      )
-  );
+              ),
+          ),
+      ),
+      );
   static final darkTheme = ThemeData(
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.darkbackground,
       brightness: Brightness.dark,
       fontFamily: 'Satoshi',
+      inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.transparent,
+          contentPadding: EdgeInsets.all(15),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+              borderSide: BorderSide(
+                color: Colors.white,
+                width: 0.4,
+              )
+          )
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,

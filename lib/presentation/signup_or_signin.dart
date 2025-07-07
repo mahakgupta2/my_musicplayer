@@ -4,6 +4,7 @@ import 'package:app/core/configs/assets/app_vectors.dart';
 import 'package:app/core/configs/theme/app_colors.dart';
 import 'package:app/helpers/is_dark.dart';
 import 'package:app/presentation/sign%20up.dart';
+import 'package:app/presentation/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -70,9 +71,12 @@ class SignupOrSignin extends StatelessWidget {
                     Expanded(
                       flex: 1,
                       child: TextButton(onPressed: (){
-
-                    },
-                        child:Text(
+                        Navigator.push(context,
+                            MaterialPageRoute(builder:(BuildContext Context)=>SigninPage()
+                            ),
+                        );
+                        },
+                          child:Text(
                             'Sign in',
                           style: TextStyle(
                             fontSize: 16,
