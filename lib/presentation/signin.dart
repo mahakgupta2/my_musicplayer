@@ -1,12 +1,30 @@
 import 'package:app/common/widget/button/basic_app_button.dart';
 import 'package:app/core/configs/assets/app_vectors.dart';
+import 'package:app/core/configs/usecase/auth/signin.dart';
+import 'package:app/data/models/auth/signin_user_req.dart';
 import 'package:app/helpers/widget/appbar/app_bar.dart';
-import 'package:app/presentation/sign%20up.dart';
+import 'package:app/main.dart';
+import 'package:app/presentation/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class SigninPage extends StatelessWidget {
-  const SigninPage ({super.key});
+class SigninPage extends StatefulWidget {
+  const SigninPage({super.key});
+
+  @override
+  State<SigninPage> createState() => _SigninPageState();
+}
+
+class _SigninPageState extends State<SigninPage> {
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +33,12 @@ class SigninPage extends StatelessWidget {
       appBar: BasicAppBar(
         title: SvgPicture.asset(
           AppVectors.logo,
-          height:100,
+          height: 100,
           width: 100,
         ),
       ),
-      body:Padding(
-        padding:EdgeInsets.symmetric(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(
           vertical: 50,
           horizontal: 30,
         ),
@@ -28,21 +46,44 @@ class SigninPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _registerText(),
-            SizedBox(height: 50),
-            _fullNameField(context),
-            SizedBox(height: 20),
+            const SizedBox(height: 50),
             _emailField(context),
-            SizedBox(height: 20),
-            BasicAppButton(onPressed: (){},
-                title:'Sign In'),
+            const SizedBox(height: 20),
+            _passwordField(context),
+            const SizedBox(height: 20),
+            BasicAppButton(
+              onPressed: () async {
+                var result = await sl<SigninUseCase>().call(
+                  params: SigninUserReq(
+                      email:_email.text.toString(),
+                      password:_password.text.toString(),
+                  )
+                );
 
+                result.fold(
+                      (l) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(l)));
+                  },
+                      (r) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => PlayerPage()),
+                          (route) => false,
+                    );
+                  },
+                );
+              },
+              title: 'Sign In',
+            ),
           ],
         ),
       ),
     );
   }
-  Widget _registerText(){
-    return Text(
+
+  Widget _registerText() {
+    return const Text(
       'Sign In',
       style: TextStyle(
         fontWeight: FontWeight.bold,
@@ -51,70 +92,53 @@ class SigninPage extends StatelessWidget {
       textAlign: TextAlign.center,
     );
   }
-  Widget _fullNameField(BuildContext context){
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Full Name',
-      ).applyDefaults(
-          Theme.of(context).inputDecorationTheme
-      ),
-    );
-  }
+
   Widget _emailField(BuildContext context) {
     return TextField(
-      decoration: InputDecoration(
+      controller: _email,
+      decoration: const InputDecoration(
         hintText: 'Enter Email',
       ).applyDefaults(
-          Theme.of(context).inputDecorationTheme
+        Theme.of(context).inputDecorationTheme,
       ),
     );
   }
+
   Widget _passwordField(BuildContext context) {
     return TextField(
-      decoration: InputDecoration(
-        hintText: 'Password',
+      controller: _password,
+      obscureText: true,
+      decoration: const InputDecoration(
+        hintText: 'Enter Password',
       ).applyDefaults(
-          Theme.of(context).inputDecorationTheme
+        Theme.of(context).inputDecorationTheme,
       ),
     );
   }
-  Widget _confirmpasswordField(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: ' Confirm Password',
-      ).applyDefaults(
-          Theme
-              .of(context)
-              .inputDecorationTheme
-      ),
-    );
-  }
+
   Widget _signinText(BuildContext context) {
     return Padding(
-      padding:EdgeInsets.symmetric(
-        vertical: 30,
-      ),
-      child:  Row(
+      padding: const EdgeInsets.symmetric(vertical: 30),
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Not A Member',
+          const Text(
+            'Not A Member?',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-          TextButton(onPressed:(){
-            Navigator.pushReplacement(
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                builder:(BuildContext Context)=>SigninPage()
+                  builder: (BuildContext context) => const SigninPage(),
                 ),
-            );
-          },
-            child:Text(
-                'Register Now'
-            ) ,
+              );
+            },
+            child: const Text('Register Now'),
           ),
         ],
       ),

@@ -1,15 +1,49 @@
-import 'package:app/core/configs/theme/app_theme.dart';
 import 'package:app/favoritepage.dart';
 import 'package:app/homepage.dart';
 import 'package:app/musicpage.dart';
+import 'package:app/presentation/root.dart';
+import 'package:app/presentation/service_locator.dart';
 import 'package:app/presentation/splash.dart';
 import 'package:app/profilepage.dart';
 import 'package:app/searchpage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: kIsWeb
+          ? HydratedStorage.webStorageDirectory
+          :await getApplicationDocumentsDirectory(),
+  );
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await initializeDependencies();
   runApp(const MusicPlayerApp());
 }
+
+Future<void> initizeDependecies() async {
+}
+
+Future getApplicationDocumentsDirectory() async {
+}
+
+class HydratedStorage {
+  static get webStorageDirectory {
+    // TODO: implement webStorageDirectory
+    throw UnimplementedError();
+  }
+
+  static Future build({required storageDirectory}) async {}
+}
+
+class HydratedBloc {
+  static var storage;
+}
+
 
 class MusicPlayerApp extends StatelessWidget {
   const MusicPlayerApp({super.key});
@@ -43,6 +77,7 @@ class _PlayerPageState extends State<PlayerPage> {
     Musicpage(),
     ProfilePage(),
     SplashPage(),
+    RootPage(),
   ];
 
   void onTabTapped(int index) {

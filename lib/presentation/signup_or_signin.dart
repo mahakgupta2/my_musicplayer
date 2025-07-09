@@ -1,7 +1,6 @@
 import 'package:app/common/widget/button/basic_app_button.dart';
 import 'package:app/core/configs/assets/app_images.dart';
 import 'package:app/core/configs/assets/app_vectors.dart';
-import 'package:app/core/configs/theme/app_colors.dart';
 import 'package:app/helpers/is_dark.dart';
 import 'package:app/presentation/sign%20up.dart';
 import 'package:app/presentation/signin.dart';

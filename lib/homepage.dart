@@ -94,7 +94,7 @@ class Homepage extends StatelessWidget {
   }
 
   Widget _buildImageRow(List<Map<String, String>> items) {
-    return Container(
+    return SizedBox(
       height: 160,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
