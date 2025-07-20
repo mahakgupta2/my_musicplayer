@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:app/favorites_store.dart'; // ✅ import shared store
+import 'package:app/data/models/auth/song_model.dart'; // ✅ for Song model
 
 void main() => runApp(const Favoritepage());
 
@@ -14,92 +17,115 @@ class Favoritepage extends StatelessWidget {
   }
 }
 
-
-class MusicPlayerScreen extends StatelessWidget {
+class MusicPlayerScreen extends StatefulWidget {
   const MusicPlayerScreen({super.key});
 
   @override
+  State<MusicPlayerScreen> createState() => _MusicPlayerScreenState();
+}
+
+class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _currentUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    FavoritesStore.instance.listenable.addListener(_refresh);
+  }
+
+  void _refresh() => setState(() {});
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    FavoritesStore.instance.listenable.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _playSong(String url) async {
+    if (_currentUrl != url) {
+      await _audioPlayer.stop();
+      await _audioPlayer.play(UrlSource(url));
+      setState(() => _currentUrl = url);
+    } else {
+      await _audioPlayer.pause();
+      setState(() => _currentUrl = null);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final List<Song> songs = FavoritesStore.instance.items;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const Icon(Icons.arrow_back, color: Colors.white),
-        title: const Text('Favorite', style: TextStyle(color: Colors.white)),
+        title: const Text('Favorite Songs', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.more_vert, color: Colors.white),
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          Center(
-            child: Container(
-              height: 150,
-              width: 150,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.yellow, width: 3),
-                shape: BoxShape.circle,
-                image: const DecorationImage(
-                  image: NetworkImage('https://c.ndtvimg.com/2020-06/s3p53j98_asim_625x300_11_June_20.jpg?downsize=545:307'),// Replace with your asset
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Text("3:15 | 4:26", style: TextStyle(color: Colors.white54)),
-          const SizedBox(height: 8),
-          const Text("Black or White",
-              style: TextStyle(color: Colors.yellow, fontSize: 18, fontWeight: FontWeight.bold)),
-          const Text("Michael Jackson  ·  Album - Dangerous",
-              style: TextStyle(color: Colors.white60)),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: const [
-              Icon(Icons.skip_previous, color: Colors.white, size: 40),
-              Icon(Icons.skip_next, color: Colors.white, size: 40),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView(
-              children: const [
-                SongTile("Khayaal Rakhya kar", "Preetinder,Rajat Nagpal",""),
-                SongTile("Be the girl", "Bebe Rexa", "assets/user2.jpg"),
-                SongTile("Countryman", "Daughtry", "assets/user3.jpg"),
-                SongTile("Do you believe in loneliness", "Marc Anthony", "assets/user4.jpg"),
-                SongTile("Earth song", "Michael Jackson", "assets/user5.jpg"),
-                SongTile("Smooth criminal", "Michael Jackson", "assets/user6.jpg"),
-              ],
-            ),
-          ),
-        ],
+      body: songs.isEmpty
+          ? const Center(
+        child: Text("No favorites yet!",
+            style: TextStyle(color: Colors.white54)),
+      )
+          : ListView.builder(
+        itemCount: songs.length,
+        itemBuilder: (_, index) {
+          final song = songs[index];
+          return SongTile(
+            song: song,
+            isPlaying: _currentUrl == song.audioUrl,
+            onPlayPause: () => _playSong(song.audioUrl),
+            onRemove: () => FavoritesStore.instance.toggle(song),
+          );
+        },
       ),
     );
   }
 }
 
 class SongTile extends StatelessWidget {
-  final String title;
-  final String artist;
-  final String image;
+  final Song song;
+  final bool isPlaying;
+  final VoidCallback onPlayPause;
+  final VoidCallback onRemove;
 
-  const SongTile(this.title, this.artist, this.image, {super.key});
+  const SongTile({
+    super.key,
+    required this.song,
+    required this.isPlaying,
+    required this.onPlayPause,
+    required this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(backgroundImage: AssetImage(image)),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
-      subtitle: Text(artist, style: const TextStyle(color: Colors.white60)),
-      trailing: const Icon(Icons.play_circle_fill, color: Colors.yellow),
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(song.imageUrl),
+      ),
+      title: Text(song.title, style: const TextStyle(color: Colors.white)),
+      subtitle: Text(song.subtitle, style: const TextStyle(color: Colors.white60)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              isPlaying ? Icons.pause_circle : Icons.play_circle,
+              color: Colors.yellow,
+            ),
+            onPressed: onPlayPause,
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite, color: Colors.red),
+            onPressed: onRemove,
+          ),
+        ],
+      ),
     );
   }
 }

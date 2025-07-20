@@ -3,10 +3,12 @@ import 'package:app/core/configs/assets/app_vectors.dart';
 import 'package:app/core/configs/usecase/auth/signup.dart';
 import 'package:app/data/models/auth/create_user_req.dart';
 import 'package:app/helpers/widget/appbar/app_bar.dart';
-import 'package:app/main.dart';
 import 'package:app/presentation/service_locator.dart';
+import 'package:app/presentation/signin.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 👈 add this
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
@@ -60,26 +62,51 @@ class _SignupPageState extends State<SignupPage> {
             const SizedBox(height: 20),
             BasicAppButton(
               onPressed: () async {
-                var result = await sl<SignupUseCase>().call(
-                  params: CreateUserReq(fullName: _fullName.text.toString(),
-                      email: _email.text.toString(),
-                      password: _password.text.toString(),
-                  ),
+                if (_password.text.trim() != _confirmPassword.text.trim()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Passwords do not match')),
+                  );
+                  return;
+                }
 
+                var result = await sl<SignupUseCase>().call(
+                  params: CreateUserReq(
+                    fullName: _fullName.text.trim(),
+                    email: _email.text.trim(),
+                    password: _password.text.trim(),
+                  ),
                 );
+
                 result.fold(
-                    (l){
-                      var snackbar=SnackBar(content: Text(l));
-                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                      },
-                    (r){
+                      (l) {
+                    var snackbar = SnackBar(content: Text(l));
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  },
+                      (userCredential) async {
+                    try {
+                      // Store user data & role in Firestore
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(userCredential.user!.uid)
+                          .set({
+                        'fullName': _fullName.text.trim(),
+                        'email': _email.text.trim(),
+                        'role': 'user', // 👈 default role
+                        'createdAt': FieldValue.serverTimestamp(),
+                      });
+
+                      // Navigate to SigninPage
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const PlayerPage()),
+                        MaterialPageRoute(builder: (context) => const SigninPage()),
                             (route) => false,
                       );
-
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Firestore Error: $e')),
+                      );
                     }
+                  },
                 );
               },
               title: 'Create Account',
@@ -149,10 +176,9 @@ class _SignupPageState extends State<SignupPage> {
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const PlayerPage()),
+                MaterialPageRoute(builder: (context) => const SigninPage()),
                     (route) => false,
               );
-
             },
             child: const Text('Sign in'),
           ),

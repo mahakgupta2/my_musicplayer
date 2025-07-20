@@ -6,14 +6,13 @@ import 'package:app/core/configs/assets/app_vectors.dart';
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
-
   @override
   State<SplashPage> createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
   @override
-  void initState(){
+  void initState() {
     super.initState();
     redirect();
   }
@@ -21,21 +20,24 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Colors.black,
-        body: Center(
-          child:SvgPicture.asset(
-              AppVectors.logo
-          ),
-
-        ),
+      backgroundColor: Colors.black,
+      body: Center(
+        child: SvgPicture.asset(AppVectors.logo),
+      ),
     );
   }
-  Future<void> redirect() async{
-    await Future.delayed(Duration(seconds: 2));
+
+  Future<void> redirect() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return; // ✅ Prevent navigation if widget is disposed
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder:(BuildContext context)=> GetStartedPage()
-      )
+      MaterialPageRoute(
+        builder: (BuildContext context) => const GetStartedPage(),
+      ),
     );
   }
 }
+

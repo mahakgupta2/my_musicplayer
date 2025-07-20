@@ -11,68 +11,68 @@ class GetStartedPage extends StatefulWidget {
 }
 
 class _GetStartedPageState extends State<GetStartedPage> {
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage(AppImages.introBG),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage(AppImages.introBG),
+              ),
             ),
           ),
-        ),
 
-        // Semi-transparent black overlay
-        Container(
-          color: Colors.black.withOpacity(0.15),
-        ),
+          // Semi-transparent black overlay
+          Container(
+            color: Colors.black.withOpacity(0.15),
+          ),
 
-        // Bottom content
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Music Love Being Jovial',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 18,
+          // Bottom content
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(40),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Music Love Being Jovial',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 21),
-                Text(
-                  'Hello Jovials Outthere',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[300],
-                    fontSize: 13,
+                  SizedBox(height: 21),
+                  Text(
+                    'Hello Jovials Outthere',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[300],
+                      fontSize: 13,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                BasicAppButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder:(BuildContext Context)=>const SignupOrSignin()
-                        )
-                    );
-                  },
-                  title: 'Get Started',
-                ),
-              ],
+                  SizedBox(height: 20),
+                  BasicAppButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder:(BuildContext Context)=>const SignupOrSignin()
+                          )
+                      );
+                    },
+                    title: 'Get Started',
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }
